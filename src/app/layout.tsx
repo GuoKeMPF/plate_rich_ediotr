@@ -1,22 +1,21 @@
 import { cn } from '@udecode/cn';
 
-import { siteConfig } from '@/config/site';
 import { fontSans } from '@/lib/fonts';
 import { TooltipProvider } from '@/components/plate-ui/tooltip';
-import { SiteHeader } from '@/components/site/site-header';
-import { TailwindIndicator } from '@/components/site/tailwind-indicator';
-import { ThemeProvider } from '@/components/site/theme-provider';
 
 import '@/styles/globals.css';
 
 import { Metadata, Viewport } from 'next';
 
+import { TailwindIndicator } from '@/components/tailwind-indicator';
+import { ThemeProvider } from '@/components/theme-provider';
+
 export const metadata: Metadata = {
   title: {
-    default: siteConfig.name,
-    template: `%s - ${siteConfig.name}`,
+    default: 'siteConfig.name',
+    template: `%s - siteConfig.name`,
   },
-  description: siteConfig.description,
+  description: 'siteConfig.description',
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon-16x16.png',
@@ -55,7 +54,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
               skipDelayDuration={0}
             >
               <div className="relative flex min-h-screen flex-col">
-                <SiteHeader />
                 <div className="flex-1">{children}</div>
               </div>
               <TailwindIndicator />

@@ -1,3 +1,5 @@
+'use client';
+
 import { withProps } from '@udecode/cn';
 import { createAlignPlugin } from '@udecode/plate-alignment';
 import { createAutoformatPlugin } from '@udecode/plate-autoformat';
@@ -23,7 +25,6 @@ import {
 } from '@udecode/plate-block-quote';
 import {
   createExitBreakPlugin,
-  createSingleLinePlugin,
   createSoftBreakPlugin,
 } from '@udecode/plate-break';
 import { createCaptionPlugin } from '@udecode/plate-caption';
@@ -92,16 +93,12 @@ import {
   ELEMENT_MENTION_INPUT,
 } from '@udecode/plate-mention';
 import { createNodeIdPlugin } from '@udecode/plate-node-id';
-import { createNormalizeTypesPlugin } from '@udecode/plate-normalizers';
 import {
   createParagraphPlugin,
   ELEMENT_PARAGRAPH,
 } from '@udecode/plate-paragraph';
 import { createResetNodePlugin } from '@udecode/plate-reset-node';
-import {
-  createDeletePlugin,
-  createSelectOnBackspacePlugin,
-} from '@udecode/plate-select';
+import { createDeletePlugin } from '@udecode/plate-select';
 import { createBlockSelectionPlugin } from '@udecode/plate-selection';
 import { createDeserializeCsvPlugin } from '@udecode/plate-serializer-csv';
 import { createDeserializeDocxPlugin } from '@udecode/plate-serializer-docx';
@@ -115,6 +112,7 @@ import {
   ELEMENT_TR,
 } from '@udecode/plate-table';
 import { createTogglePlugin, ELEMENT_TOGGLE } from '@udecode/plate-toggle';
+import { createTrailingBlockPlugin } from '@udecode/plate-trailing-block';
 
 import { BlockquoteElement } from '@/components/plate-ui/blockquote-element';
 import { CodeBlockElement } from '@/components/plate-ui/code-block-element';
@@ -127,27 +125,26 @@ import { CommentLeaf } from '@/components/plate-ui/comment-leaf';
 import { EmojiCombobox } from '@/components/plate-ui/emoji-combobox';
 import { ExcalidrawElement } from '@/components/plate-ui/excalidraw-element';
 import { HeadingElement } from '@/components/plate-ui/heading-element';
+import { HighlightLeaf } from '@/components/plate-ui/highlight-leaf';
 import { HrElement } from '@/components/plate-ui/hr-element';
 import { ImageElement } from '@/components/plate-ui/image-element';
 import { KbdLeaf } from '@/components/plate-ui/kbd-leaf';
 import { LinkElement } from '@/components/plate-ui/link-element';
 import { LinkFloatingToolbar } from '@/components/plate-ui/link-floating-toolbar';
 import { MediaEmbedElement } from '@/components/plate-ui/media-embed-element';
+import { MentionElement } from '@/components/plate-ui/mention-element';
 import { MentionInputElement } from '@/components/plate-ui/mention-input-element';
 import { ParagraphElement } from '@/components/plate-ui/paragraph-element';
+import { withPlaceholders } from '@/components/plate-ui/placeholder';
 import {
   TableCellElement,
   TableCellHeaderElement,
 } from '@/components/plate-ui/table-cell-element';
+import { TableElement } from '@/components/plate-ui/table-element';
 import { TableRowElement } from '@/components/plate-ui/table-row-element';
+import { TodoListElement } from '@/components/plate-ui/todo-list-element';
 import { ToggleElement } from '@/components/plate-ui/toggle-element';
 import { withDraggables } from '@/components/plate-ui/with-draggables';
-
-import { HighlightLeaf } from '../plate-ui/highlight-leaf';
-import { MentionElement } from '../plate-ui/mention-element';
-import { withPlaceholders } from '../plate-ui/placeholder';
-import { TableElement } from '../plate-ui/table-element';
-import { TodoListElement } from '../plate-ui/todo-list-element';
 
 export const plugins = createPlugins(
   [
@@ -275,7 +272,6 @@ export const plugins = createPlugins(
       },
     }),
     createNodeIdPlugin(),
-    createNormalizeTypesPlugin(),
     createResetNodePlugin({
       options: {
         rules: [
@@ -283,17 +279,7 @@ export const plugins = createPlugins(
         ],
       },
     }),
-    createSelectOnBackspacePlugin({
-      options: {
-        query: {
-          allow: [
-            // ELEMENT_IMAGE, ELEMENT_HR
-          ],
-        },
-      },
-    }),
     createDeletePlugin(),
-    createSingleLinePlugin(),
     createSoftBreakPlugin({
       options: {
         rules: [
@@ -310,6 +296,9 @@ export const plugins = createPlugins(
       },
     }),
     createTabbablePlugin(),
+    createTrailingBlockPlugin({
+      options: { type: ELEMENT_PARAGRAPH },
+    }),
     createCommentsPlugin(),
     createDeserializeDocxPlugin(),
     createDeserializeCsvPlugin(),
