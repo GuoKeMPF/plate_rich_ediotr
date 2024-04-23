@@ -5,7 +5,7 @@ import * as ToolbarPrimitive from '@radix-ui/react-toolbar';
 import { cn, withCn, withRef, withVariants } from '@udecode/cn';
 import { cva, VariantProps } from 'class-variance-authority';
 
-import { Icons } from '@/components/icons';
+import { Icons } from '@/components/plate-ui/icons';
 
 import { Separator } from './separator';
 import { withTooltip } from './tooltip';
@@ -64,10 +64,10 @@ const ToolbarButton = withTooltip(
       React.ComponentPropsWithoutRef<typeof ToolbarToggleItem>,
       'asChild' | 'value'
     > &
-      VariantProps<typeof toolbarButtonVariants> & {
-        pressed?: boolean;
-        isDropdown?: boolean;
-      }
+    VariantProps<typeof toolbarButtonVariants> & {
+      pressed?: boolean;
+      isDropdown?: boolean;
+    }
   >(
     (
       { className, variant, size, isDropdown, children, pressed, ...props },
