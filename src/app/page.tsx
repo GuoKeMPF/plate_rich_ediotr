@@ -1,7 +1,4 @@
-import { PlateEditor } from '@/components/editor';
-
-// import dynamic from 'next/dynamic';
-// const { PlateEditor } = dynamic(() => import('@/components/editor'));
+import { PlateEditor } from '@/components/editor'
 
 export default function IndexPage() {
   return (

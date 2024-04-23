@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { withProps } from '@udecode/cn';
 import { createAlignPlugin } from '@udecode/plate-alignment';
 import { createAutoformatPlugin } from '@udecode/plate-autoformat';
@@ -35,11 +36,19 @@ import {
   ELEMENT_CODE_SYNTAX,
 } from '@udecode/plate-code-block';
 import { createComboboxPlugin } from '@udecode/plate-combobox';
-import { createCommentsPlugin, MARK_COMMENT } from '@udecode/plate-comments';
 import {
+  CommentsProvider,
+  createCommentsPlugin,
+  MARK_COMMENT,
+} from '@udecode/plate-comments';
+import {
+  createPlateEditor,
   createPlugins,
+  deserializeHtml,
+  Plate,
   PlateLeaf,
   RenderAfterEditable,
+  TElement,
 } from '@udecode/plate-common';
 import { createDndPlugin } from '@udecode/plate-dnd';
 import { createEmojiPlugin } from '@udecode/plate-emoji';
@@ -103,6 +112,7 @@ import { createDeletePlugin } from '@udecode/plate-select';
 import { createBlockSelectionPlugin } from '@udecode/plate-selection';
 import { createDeserializeCsvPlugin } from '@udecode/plate-serializer-csv';
 import { createDeserializeDocxPlugin } from '@udecode/plate-serializer-docx';
+import { serializeHtml } from '@udecode/plate-serializer-html';
 import { createDeserializeMdPlugin } from '@udecode/plate-serializer-md';
 import { createTabbablePlugin } from '@udecode/plate-tabbable';
 import {
@@ -114,6 +124,8 @@ import {
 } from '@udecode/plate-table';
 import { createTogglePlugin, ELEMENT_TOGGLE } from '@udecode/plate-toggle';
 import { createTrailingBlockPlugin } from '@udecode/plate-trailing-block';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { BlockquoteElement } from '@/components/plate-ui/blockquote-element';
 import { CodeBlockElement } from '@/components/plate-ui/code-block-element';
@@ -123,8 +135,14 @@ import { CodeSyntaxLeaf } from '@/components/plate-ui/code-syntax-leaf';
 import { ColumnElement } from '@/components/plate-ui/column-element';
 import { ColumnGroupElement } from '@/components/plate-ui/column-group-element';
 import { CommentLeaf } from '@/components/plate-ui/comment-leaf';
+import { CommentsPopover } from '@/components/plate-ui/comments-popover';
+import { Editor } from '@/components/plate-ui/editor';
 import { EmojiCombobox } from '@/components/plate-ui/emoji-combobox';
 import { ExcalidrawElement } from '@/components/plate-ui/excalidraw-element';
+import { FixedToolbar } from '@/components/plate-ui/fixed-toolbar';
+import { FixedToolbarButtons } from '@/components/plate-ui/fixed-toolbar-buttons';
+import { FloatingToolbar } from '@/components/plate-ui/floating-toolbar';
+import { FloatingToolbarButtons } from '@/components/plate-ui/floating-toolbar-buttons';
 import { HeadingElement } from '@/components/plate-ui/heading-element';
 import { HighlightLeaf } from '@/components/plate-ui/highlight-leaf';
 import { HrElement } from '@/components/plate-ui/hr-element';
@@ -133,6 +151,7 @@ import { KbdLeaf } from '@/components/plate-ui/kbd-leaf';
 import { LinkElement } from '@/components/plate-ui/link-element';
 import { LinkFloatingToolbar } from '@/components/plate-ui/link-floating-toolbar';
 import { MediaEmbedElement } from '@/components/plate-ui/media-embed-element';
+import { MentionCombobox } from '@/components/plate-ui/mention-combobox';
 import { MentionElement } from '@/components/plate-ui/mention-element';
 import { MentionInputElement } from '@/components/plate-ui/mention-input-element';
 import { ParagraphElement } from '@/components/plate-ui/paragraph-element';
@@ -147,7 +166,7 @@ import { TodoListElement } from '@/components/plate-ui/todo-list-element';
 import { ToggleElement } from '@/components/plate-ui/toggle-element';
 import { withDraggables } from '@/components/plate-ui/with-draggables';
 
-export const plugins = createPlugins(
+const plugins = createPlugins(
   [
     createParagraphPlugin(),
     createHeadingPlugin(),
@@ -288,9 +307,7 @@ export const plugins = createPlugins(
           {
             hotkey: 'enter',
             query: {
-              allow: [
-                // ELEMENT_CODE_BLOCK, ELEMENT_BLOCKQUOTE, ELEMENT_TD
-              ],
+              allow: [ELEMENT_CODE_BLOCK, ELEMENT_BLOCKQUOTE, ELEMENT_TD],
             },
           },
         ],
@@ -349,3 +366,54 @@ export const plugins = createPlugins(
     ),
   }
 );
+
+export const PlateEditor = ({ initialHtml = '' }: { initialHtml?: string }) => {
+  const plateEditor = useMemo(() => {
+    const excludedSelectionPlugin = plugins?.filter(
+      (plugin) => plugin?.key !== 'toggle' && plugin?.key !== 'blockSelection'
+    );
+    return createPlateEditor({
+      plugins: excludedSelectionPlugin,
+    });
+  }, []);
+
+  const initialValue = useMemo(() => {
+    return deserializeHtml(plateEditor, {
+      element: initialHtml,
+    }) as TElement[];
+  }, [initialHtml]);
+
+  const onChange = (value: any) => {
+    const htmlStr = serializeHtml(plateEditor, {
+      nodes: value,
+      dndWrapper: (props) => <DndProvider backend={HTML5Backend} {...props} />,
+    });
+    console.log(htmlStr);
+  };
+
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <CommentsProvider users={{}} myUserId="1">
+        <Plate
+          onChange={onChange}
+          plugins={plugins}
+          initialValue={initialValue}
+        >
+          <FixedToolbar>
+            <FixedToolbarButtons />
+          </FixedToolbar>
+
+          <Editor />
+
+          <FloatingToolbar>
+            <FloatingToolbarButtons />
+          </FloatingToolbar>
+          <MentionCombobox items={[]} />
+          <CommentsPopover />
+        </Plate>
+      </CommentsProvider>
+    </DndProvider>
+  );
+};
+
+export default PlateEditor;
